@@ -10,6 +10,12 @@ router.put(
     TutorController.updateProfile
 );
 
-router.put("/availability", auth(UserRole.TUTOR), TutorController.updateAvailability);
+router.put(
+    "/availability",
+    auth(UserRole.TUTOR),
+    TutorController.updateAvailability
+);
+
+
 
 export const TutorRoutes: Router = router;

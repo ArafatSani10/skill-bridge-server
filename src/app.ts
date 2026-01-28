@@ -3,6 +3,7 @@ import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import { TutorRoutes } from "./modules/tutor/tutor.routes";
+import { BookingRoutes } from "./modules/booking/booking.routes";
 
 const app: Application = express();
 
@@ -18,6 +19,7 @@ app.all("/api/auth/*", (req, res) => {
 });
 
 app.use("/api/tutor", TutorRoutes);
+app.use("/api/bookings", BookingRoutes)
 
 app.get("/", (req, res) => {
     res.send("Skill Bridge is running ...");
