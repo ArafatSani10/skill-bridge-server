@@ -5,9 +5,8 @@ const createOrUpdateProfile = async (userId: string, data: any) => {
         where: { userId: userId },
         update: {
             bio: data.bio,
-            pricePerHour: parseFloat(data.pricePerHour), // Float এর জন্য parseFloat
-            experience: parseInt(data.experience),       // Int এর জন্য parseInt
-            // categories আপডেট করার লজিক একটু আলাদা হয়, আপাতত সাধারণ ফিল্ডগুলো সেভ করি
+            pricePerHour: parseFloat(data.pricePerHour),
+            experience: parseInt(data.experience),
         },
         create: {
             userId: userId,
@@ -18,4 +17,24 @@ const createOrUpdateProfile = async (userId: string, data: any) => {
     });
 };
 
-export const TutorService = { createOrUpdateProfile };
+const updateAvailability = async (userId: string, slots: { startTime: Date, endTime: Date }[]) => {
+    const tutor = await prisma.tutorProfile.findUnique({
+        where: { userId }
+    });
+
+    if (!tutor) throw new Error("Tutor profile not found!");
+
+    const createdSlots = await prisma.availabilitySlot.createMany({
+        data: slots.map(slot => ({
+            tutorId: tutor.id,
+            startTime: new Date(slot.startTime),
+            endTime: new Date(slot.endTime),
+        }))
+    });
+
+    return createdSlots;
+};
+
+
+
+export const TutorService = { createOrUpdateProfile, updateAvailability };

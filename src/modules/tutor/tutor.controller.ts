@@ -30,4 +30,21 @@ const updateProfile = async (req: Request, res: Response) => {
     }
 };
 
-export const TutorController = { updateProfile };
+const updateAvailability = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user!.id;
+        const { slots } = req.body;
+
+        const result = await TutorService.updateAvailability(userId, slots);
+
+        res.status(200).json({
+            success: true,
+            message: "Availability slots added successfully!",
+            data: result
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const TutorController = { updateProfile, updateAvailability };
