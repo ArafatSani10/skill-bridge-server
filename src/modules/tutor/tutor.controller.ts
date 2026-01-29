@@ -47,4 +47,20 @@ const updateAvailability = async (req: Request, res: Response) => {
     }
 };
 
-export const TutorController = { updateProfile, updateAvailability };
+
+const getAllTutors = async (req: Request, res: Response) => {
+    try {
+        const query = req.query;
+        const result = await TutorService.getAllTutors(query);
+
+        res.status(200).json({
+            success: true,
+            message: "Tutors fetched successfully!",
+            data: result
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const TutorController = { updateProfile, updateAvailability,getAllTutors };

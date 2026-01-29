@@ -35,6 +35,40 @@ const updateAvailability = async (userId: string, slots: { startTime: Date, endT
     return createdSlots;
 };
 
+const getAllTutors = async (query: any) => {
+    const { searchTerm, minPrice, maxPrice, sortBy, sortOrder } = query;
+
+    const where: any = {};
+
+    if (searchTerm) {
+        where.OR = [
+            { user: { name: { contains: searchTerm, mode: 'insensitive' } } },
+            { bio: { contains: searchTerm, mode: 'insensitive' } }
+        ];
+    }
+
+    if (minPrice || maxPrice) {
+        where.pricePerHour = {
+            gte: minPrice ? parseFloat(minPrice) : undefined,
+            lte: maxPrice ? parseFloat(maxPrice) : undefined,
+        };
+    }
+
+    return await prisma.tutorProfile.findMany({
+        where,
+        include: {
+            user: {
+                select: {
+                    name: true,
+                    image: true,
+                }
+            },
+            reviews: true
+        },
+        orderBy: sortBy ? { [sortBy]: sortOrder || 'desc' } : { averageRating: 'desc' }
+    });
+};
 
 
-export const TutorService = { createOrUpdateProfile, updateAvailability };
+
+export const TutorService = { createOrUpdateProfile, updateAvailability, getAllTutors };
