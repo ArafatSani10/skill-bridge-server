@@ -17,7 +17,7 @@ const createCategory = async (subjectName: string) => {
 const getAllCategories = async () => {
     return await prisma.category.findMany({
         orderBy: {
-            name: 'asc' 
+            name: 'asc'
         }
     });
 };

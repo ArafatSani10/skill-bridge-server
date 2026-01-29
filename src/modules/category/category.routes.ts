@@ -15,7 +15,7 @@ router.post(
 
 router.get(
     "/",
-    auth(UserRole.ADMIN),
+    // auth(UserRole.ADMIN),
     CategoryController.getAllCategories
 );
 
