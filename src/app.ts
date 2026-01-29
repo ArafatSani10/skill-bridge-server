@@ -5,6 +5,7 @@ import { auth } from "./lib/auth";
 import { TutorRoutes } from "./modules/tutor/tutor.routes";
 import { BookingRoutes } from "./modules/booking/booking.routes";
 import { ReviewRoutes } from "./modules/review/review.routes";
+import { CategoryRoutes } from "./modules/category/category.routes";
 
 const app: Application = express();
 
@@ -22,6 +23,7 @@ app.all("/api/auth/*", (req, res) => {
 app.use("/api/tutor", TutorRoutes);
 app.use("/api/bookings", BookingRoutes);
 app.use("/api/reviews", ReviewRoutes);
+app.use("/api/categories", CategoryRoutes);
 
 app.get("/", (req, res) => {
     res.send("Skill Bridge is running ...");
