@@ -29,6 +29,21 @@ const getMyBookings = async (req: Request, res: Response) => {
     }
 };
 
+const getBookingById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const result = await BookingService.getBookingById(id);
+
+        if (!result) {
+            return res.status(404).json({ success: false, message: "Booking not found!" });
+        }
+
+        res.status(200).json({ success: true, message: "succesfully getting by details..", data: result });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 const updateBookingStatus = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -60,4 +75,4 @@ const updateBookingStatus = async (req: Request, res: Response) => {
     }
 };
 
-export const BookingController = { createBooking, getMyBookings, updateBookingStatus };
+export const BookingController = { createBooking, getMyBookings, updateBookingStatus, getBookingById };
