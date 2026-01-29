@@ -16,4 +16,10 @@ router.get(
     BookingController.getMyBookings
 );
 
+router.patch(
+    "/:id/status",
+    auth(UserRole.STUDENT, UserRole.TUTOR),
+    BookingController.updateBookingStatus
+);
+
 export const BookingRoutes: Router = router;

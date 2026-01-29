@@ -43,4 +43,13 @@ const getMyBookings = async (userId: string, role: string) => {
     }
 };
 
-export const BookingService = { createBooking, getMyBookings };
+
+const updateBookingStatus = async (bookingId: string, status: string) => {
+    return await prisma.booking.update({
+        where: { id: bookingId },
+        data: { status }
+    });
+};
+
+
+export const BookingService = { createBooking, getMyBookings, updateBookingStatus };

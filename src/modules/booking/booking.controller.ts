@@ -29,4 +29,35 @@ const getMyBookings = async (req: Request, res: Response) => {
     }
 };
 
-export const BookingController = { createBooking, getMyBookings };
+const updateBookingStatus = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const role = req.user!.role;
+
+        if (role === "TUTOR" && status !== "COMPLETED") {
+            return res.status(403).json({
+                success: false,
+                message: "Tutors can only mark a session as COMPLETED."
+            });
+        }
+
+        if (role === "STUDENT" && status !== "CANCELLED") {
+            return res.status(403).json({
+                success: false,
+                message: "Students can only CANCEL their booking."
+            });
+        }
+
+        const result = await BookingService.updateBookingStatus(id, status);
+        res.status(200).json({
+            success: true,
+            message: `Booking has been ${status.toLowerCase()} successfully!`,
+            data: result
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const BookingController = { createBooking, getMyBookings, updateBookingStatus };
