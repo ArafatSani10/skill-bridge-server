@@ -13,4 +13,11 @@ const getAllUsers = async () => {
     });
 };
 
-export const AdminService = { getAllUsers };
+const toggleUserStatus = async (userId: string, status: string) => {
+    return await prisma.user.update({
+        where: { id: userId },
+        data: { status }
+    });
+};
+
+export const AdminService = { getAllUsers, toggleUserStatus };
