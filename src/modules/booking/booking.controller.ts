@@ -47,31 +47,39 @@ const getBookingById = async (req: Request, res: Response) => {
 const updateBookingStatus = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { status } = req.body;
+        const { status } = req.body as { status: BookingStatus };
+        const userId = req.user!.id;
         const role = req.user!.role;
 
-        if (role === "TUTOR" && status !== "COMPLETED") {
-            return res.status(403).json({
-                success: false,
-                message: "Tutors can only mark a session as COMPLETED."
-            });
+        if (role === "TUTOR") {
+            const allowedTutorStatuses: BookingStatus[] = ["CONFIRMED", "COMPLETED", "CANCELLED"];
+            if (!allowedTutorStatuses.includes(status)) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Tutors can only set status to CONFIRMED, COMPLETED, or CANCELLED."
+                });
+            }
+        } else if (role === "STUDENT") {
+            if (status !== "CANCELLED") {
+                return res.status(403).json({
+                    success: false,
+                    message: "Students can only CANCEL their booking."
+                });
+            }
         }
 
-        if (role === "STUDENT" && status !== "CANCELLED") {
-            return res.status(403).json({
-                success: false,
-                message: "Students can only CANCEL their booking."
-            });
-        }
+        const result = await BookingService.updateBookingStatus(id, userId, status);
 
-        const result = await BookingService.updateBookingStatus(id, status);
         res.status(200).json({
             success: true,
             message: `Booking has been ${status.toLowerCase()} successfully!`,
             data: result
         });
     } catch (error: any) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(error.message.includes("authorized") ? 403 : 500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 

@@ -29,5 +29,4 @@ router.patch(
 );
 
 
-
 export const BookingRoutes: Router = router;

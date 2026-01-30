@@ -55,11 +55,45 @@ const getBookingById = async (id: string) => {
 };
 
 
-const updateBookingStatus = async (bookingId: string, status: string) => {
-    return await prisma.booking.update({
-        where: { id: bookingId },
-        data: { status }
+const updateBookingStatus = async (
+  bookingId: string,
+  userId: string, 
+  status: BookingStatus
+) => {
+  const tutorProfile = await prisma.tutorProfile.findUnique({
+    where: { userId },
+  });
+
+  if (!tutorProfile) {
+    throw new Error("Tutor profile not found!");
+  }
+
+  const booking = await prisma.booking.findFirst({
+    where: {
+      id: bookingId,
+      tutorId: tutorProfile.id,
+    },
+  });
+
+  if (!booking) {
+    throw new Error("You are not authorized to update this booking!");
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    const updatedBooking = await tx.booking.update({
+      where: { id: bookingId },
+      data: { status },
     });
+
+    if (status === "CANCELLED") {
+      await tx.availabilitySlot.update({
+        where: { id: booking.slotId },
+        data: { isBooked: false },
+      });
+    }
+
+    return updatedBooking;
+  });
 };
 
 
