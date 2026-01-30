@@ -10,6 +10,28 @@ const getStudentStats = async (studentId: string) => {
     return { totalBookings, pendingBookings, completedBookings };
 };
 
+const getTutorStats = async (tutorUserId: string) => {
+    const tutorProfile = await prisma.tutorProfile.findUnique({
+        where: { userId: tutorUserId },
+        select: { id: true, averageRating: true, experience: true }
+    });
+
+    if (!tutorProfile) {
+        return { totalSessions: 0, averageRating: 0, experience: 0 };
+    }
+
+    const totalSessions = await prisma.booking.count({
+        where: { tutorId: tutorProfile.id }
+    });
+
+    return {
+        totalSessions,
+        averageRating: tutorProfile.averageRating || 0,
+        experience: tutorProfile.experience || 0
+    };
+};
+
 export const StatsService = {
-    getStudentStats
+    getStudentStats,
+    getTutorStats
 }

@@ -10,6 +10,10 @@ router.get(
     StatsController.getStudentStats
 );
 
-
+router.get(
+    "/tutor-stats",
+    auth(UserRole.TUTOR),
+    StatsController.getTutorStats
+);
 
 export const StatsRoutes: Router = router;
