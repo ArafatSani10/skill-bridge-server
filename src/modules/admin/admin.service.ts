@@ -20,4 +20,32 @@ const toggleUserStatus = async (userId: string, status: string) => {
     });
 };
 
-export const AdminService = { getAllUsers, toggleUserStatus };
+
+const getAllBookings = async () => {
+    return await prisma.booking.findMany({
+        include: {
+            student: {
+                select: {
+                    name: true,
+                    email: true
+                }
+            },
+            tutor: {
+                select: {
+                    user: {
+                        select: {
+                            name: true
+                        }
+                    }
+                }
+            },
+            slot: true
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
+};
+
+
+export const AdminService = { getAllUsers, toggleUserStatus, getAllBookings };

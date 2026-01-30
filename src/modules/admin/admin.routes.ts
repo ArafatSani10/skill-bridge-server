@@ -15,6 +15,13 @@ router.get(
 router.patch(
     "/users/:id/status",
     auth(UserRole.ADMIN),
-    AdminController.updateUserStatus);
+    AdminController.updateUserStatus
+);
+
+router.get(
+    "/bookings",
+    auth(UserRole.ADMIN),
+    AdminController.getAllBookings
+);
 
 export const AdminRoutes: Router = router;
