@@ -49,6 +49,3 @@ SkillBridge হলো একটি আধুনিক এবং শক্তি�
 | **Auth** | Better-Auth (Session & Account Management) |
 
 ---
-
-
-   git clone <repo-url>

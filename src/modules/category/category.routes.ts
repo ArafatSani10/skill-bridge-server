@@ -19,4 +19,18 @@ router.get(
     CategoryController.getAllCategories
 );
 
+router.patch(
+    "/categories/:id",
+    auth(UserRole.ADMIN),
+    CategoryController.editCategory
+);
+
+router.delete(
+    "/categories/:id",
+    auth(UserRole.ADMIN),
+    CategoryController.removeCategory
+);
+
+
+
 export const CategoryRoutes: Router = router;

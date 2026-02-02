@@ -51,4 +51,41 @@ const getAllBookings = async (req: Request, res: Response) => {
     }
 };
 
-export const AdminController = { getAllUsers, updateUserStatus, getAllBookings };
+const getCategories = async (req: Request, res: Response) => {
+    try {
+        const result = await AdminService.getAllCategoriesFromDB();
+        res.status(200).json({
+            success: true,
+            message: "Categories retrieved successfully",
+            data: result
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const addCategory = async (req: Request, res: Response) => {
+    try {
+        const { name } = req.body;
+        const result = await AdminService.createCategoryInDB(name);
+        res.status(201).json({
+            success: true,
+            message: "Category created successfully",
+            data: result
+        });
+    } catch (error: any) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+
+
+
+export const AdminController = {
+    getAllUsers,
+    updateUserStatus,
+    getAllBookings,
+    getCategories,
+    addCategory,
+   
+};

@@ -48,4 +48,30 @@ const getAllBookings = async () => {
 };
 
 
-export const AdminService = { getAllUsers, toggleUserStatus, getAllBookings };
+const createCategoryInDB = async (name: string) => {
+    return await prisma.category.create({
+        data: { name }
+    });
+};
+
+const getAllCategoriesFromDB = async () => {
+    return await prisma.category.findMany({
+        include: {
+            _count: {
+                select: { tutors: true }
+            }
+        },
+        orderBy: { name: 'asc' }
+    });
+};
+
+
+
+export const AdminService = {
+    getAllUsers,
+    toggleUserStatus,
+    getAllBookings,
+    createCategoryInDB,
+    getAllCategoriesFromDB,
+
+};

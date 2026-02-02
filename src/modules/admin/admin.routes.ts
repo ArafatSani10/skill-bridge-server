@@ -24,4 +24,21 @@ router.get(
     AdminController.getAllBookings
 );
 
+
+// router.get(
+//     "/categories",
+//     auth(UserRole.ADMIN),
+//     AdminController.getCategories
+// );
+
+// router.post(
+//     "/categories",
+//     auth(UserRole.ADMIN),
+//     AdminController.addCategory
+// );
+
+
+
+
+
 export const AdminRoutes: Router = router;
