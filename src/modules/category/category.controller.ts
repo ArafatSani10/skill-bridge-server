@@ -48,11 +48,17 @@ const getAllCategories = async (req: Request, res: Response) => {
 const editCategory = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { name } = req.body;
-        const result = await CategoryService.updateCategoryInDB(id, name);
+        const { subject } = req.body;
+
+        if (!subject) {
+            return res.status(400).json({ success: false, message: "Please provide a subject name!" });
+        }
+
+        const result = await CategoryService.updateCategoryInDB(id, subject);
+
         res.status(200).json({
             success: true,
-            message: "Category updated successfully",
+            message: "Category updated successfully!",
             data: result
         });
     } catch (error: any) {

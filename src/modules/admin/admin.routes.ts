@@ -25,17 +25,6 @@ router.get(
 );
 
 
-// router.get(
-//     "/categories",
-//     auth(UserRole.ADMIN),
-//     AdminController.getCategories
-// );
-
-// router.post(
-//     "/categories",
-//     auth(UserRole.ADMIN),
-//     AdminController.addCategory
-// );
 
 
 

@@ -22,10 +22,10 @@ const getAllCategories = async () => {
     });
 };
 
-const updateCategoryInDB = async (id: string, name: string) => {
+const updateCategoryInDB = async (id: string, updatedName: string) => {
     return await prisma.category.update({
         where: { id },
-        data: { name }
+        data: { name: updatedName }
     });
 };
 
