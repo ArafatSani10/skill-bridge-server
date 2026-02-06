@@ -43,6 +43,8 @@ const updateAvailability = async (userId: string, slots: { startTime: Date, endT
     });
 };
 
+
+
 const getAllTutors = async (query: any) => {
     const { searchTerm, minPrice, maxPrice, sortBy, sortOrder, categoryId } = query;
 
@@ -73,13 +75,46 @@ const getAllTutors = async (query: any) => {
         include: {
             user: { select: { name: true, image: true, email: true } },
             categories: true,
-            reviews: true
+            reviews: true,
+            slots: {
+                where: {
+                    isBooked: false 
+                }
+            }
         },
         orderBy: sortBy ? { [sortBy]: sortOrder || 'desc' } : { averageRating: 'desc' }
     });
 };
 
 
+const getMyStudents = async (userId: string) => {
+  const tutor = await prisma.tutorProfile.findUnique({
+    where: { userId: userId }
+  });
 
+  if (!tutor) {
+    return [];
+  }
 
-export const TutorService = { createOrUpdateProfile, updateAvailability, getAllTutors };
+  const result = await prisma.booking.findMany({
+    where: {
+      tutorId: tutor.id, 
+    },
+    include: {
+      student: {
+        select: {
+          name: true,
+          email: true,
+          image: true
+        }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  return result;
+};
+
+export const TutorService = { createOrUpdateProfile,getMyStudents, updateAvailability, getAllTutors };

@@ -1,4 +1,3 @@
-
 import { prisma } from "../../lib/prisma";
 
 const createBooking = async (studentId: string, tutorId: string, slotId: string) => {
@@ -6,9 +5,14 @@ const createBooking = async (studentId: string, tutorId: string, slotId: string)
         where: { id: slotId }
     });
 
-    if (!slot || slot.isBooked) {
-        throw new Error("This slot is already booked or does not exist!");
-    }
+    if (!slot) throw new Error("This slot does not exist!");
+    if (slot.isBooked) throw new Error("This slot is already taken!");
+
+    const existingBooking = await prisma.booking.findFirst({
+        where: { studentId, slotId }
+    });
+
+    if (existingBooking) throw new Error("You have already booked this specific slot!");
 
     return await prisma.$transaction(async (tx) => {
         const booking = await tx.booking.create({
@@ -31,14 +35,28 @@ const createBooking = async (studentId: string, tutorId: string, slotId: string)
 
 const getMyBookings = async (userId: string, role: string) => {
     if (role === "TUTOR") {
+        const tutorProfile = await prisma.tutorProfile.findUnique({
+            where: { userId }
+        });
+
+        if (!tutorProfile) return [];
+
         return await prisma.booking.findMany({
-            where: { tutorId: userId },
-            include: { student: true, slot: true }
+            where: { tutorId: tutorProfile.id },
+            include: { 
+                student: { select: { name: true, image: true, email: true } }, 
+                slot: true 
+            },
+            orderBy: { createdAt: 'desc' }
         });
     } else {
         return await prisma.booking.findMany({
             where: { studentId: userId },
-            include: { tutor: { include: { user: true } }, slot: true }
+            include: { 
+                tutor: { include: { user: { select: { name: true, image: true } } } }, 
+                slot: true 
+            },
+            orderBy: { createdAt: 'desc' }
         });
     }
 };
@@ -54,47 +72,29 @@ const getBookingById = async (id: string) => {
     });
 };
 
-
-const updateBookingStatus = async (
-  bookingId: string,
-  userId: string, 
-  status: BookingStatus
-) => {
-  const tutorProfile = await prisma.tutorProfile.findUnique({
-    where: { userId },
-  });
-
-  if (!tutorProfile) {
-    throw new Error("Tutor profile not found!");
-  }
-
-  const booking = await prisma.booking.findFirst({
-    where: {
-      id: bookingId,
-      tutorId: tutorProfile.id,
-    },
-  });
-
-  if (!booking) {
-    throw new Error("You are not authorized to update this booking!");
-  }
-
-  return await prisma.$transaction(async (tx) => {
-    const updatedBooking = await tx.booking.update({
-      where: { id: bookingId },
-      data: { status },
+const updateBookingStatus = async (bookingId: string, userId: string, status: any) => {
+    const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+        include: { tutor: true }
     });
 
-    if (status === "CANCELLED") {
-      await tx.availabilitySlot.update({
-        where: { id: booking.slotId },
-        data: { isBooked: false },
-      });
-    }
+    if (!booking) throw new Error("Booking not found!");
 
-    return updatedBooking;
-  });
+    return await prisma.$transaction(async (tx) => {
+        const updatedBooking = await tx.booking.update({
+            where: { id: bookingId },
+            data: { status },
+        });
+
+        if (status === "CANCELLED") {
+            await tx.availabilitySlot.update({
+                where: { id: booking.slotId },
+                data: { isBooked: false },
+            });
+        }
+
+        return updatedBooking;
+    });
 };
-
 
 export const BookingService = { createBooking, getMyBookings, updateBookingStatus, getBookingById };

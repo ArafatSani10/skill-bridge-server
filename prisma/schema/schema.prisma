@@ -97,6 +97,7 @@ model Booking {
 
   @@index([studentId])
   @@index([tutorId])
+  
 }
 
 model Review {

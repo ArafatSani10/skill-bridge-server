@@ -21,6 +21,13 @@ router.get("/",
 );
 
 
+router.get(
+  '/my-students',
+  auth(UserRole.TUTOR), 
+  TutorController.getMyStudents
+);
+
+
 
 
 

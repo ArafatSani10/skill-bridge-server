@@ -39,6 +39,23 @@ const getAllTutors = async (req: Request, res: Response) => {
     }
 };
 
+const getMyStudents = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+        const result = await TutorService.getMyStudents(userId);
+
+        res.status(200).json({
+            success: true,
+            message: "Students fetched successfully",
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 
-export const TutorController = { updateProfile, updateAvailability, getAllTutors };
+
+export const TutorController = { updateProfile, getMyStudents, updateAvailability, getAllTutors };
