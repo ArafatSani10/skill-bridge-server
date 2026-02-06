@@ -80,6 +80,10 @@ const updateBookingStatus = async (bookingId: string, userId: string, status: an
 
     if (!booking) throw new Error("Booking not found!");
 
+    if (booking.tutor.userId !== userId && booking.studentId !== userId) {
+        throw new Error("You are not authorized to update this booking!");
+    }
+
     return await prisma.$transaction(async (tx) => {
         const updatedBooking = await tx.booking.update({
             where: { id: bookingId },
@@ -97,4 +101,9 @@ const updateBookingStatus = async (bookingId: string, userId: string, status: an
     });
 };
 
-export const BookingService = { createBooking, getMyBookings, updateBookingStatus, getBookingById };
+export const BookingService = { 
+    createBooking, 
+    getMyBookings, 
+    updateBookingStatus, 
+    getBookingById 
+};

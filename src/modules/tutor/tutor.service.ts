@@ -78,7 +78,7 @@ const getAllTutors = async (query: any) => {
             reviews: true,
             slots: {
                 where: {
-                    isBooked: false 
+                    isBooked: false
                 }
             }
         },
@@ -88,33 +88,36 @@ const getAllTutors = async (query: any) => {
 
 
 const getMyStudents = async (userId: string) => {
-  const tutor = await prisma.tutorProfile.findUnique({
-    where: { userId: userId }
-  });
+    const tutor = await prisma.tutorProfile.findUnique({
+        where: { userId: userId }
+    });
 
-  if (!tutor) {
-    return [];
-  }
-
-  const result = await prisma.booking.findMany({
-    where: {
-      tutorId: tutor.id, 
-    },
-    include: {
-      student: {
-        select: {
-          name: true,
-          email: true,
-          image: true
-        }
-      }
-    },
-    orderBy: {
-      createdAt: 'desc'
+    if (!tutor) {
+        return [];
     }
-  });
 
-  return result;
+    const result = await prisma.booking.findMany({
+        where: {
+            tutorId: tutor.id,
+            status: {
+                not: 'CANCELLED' // Jader status CANCELLED na, sudhu tader e dekhabe
+            }
+        },
+        include: {
+            student: {
+                select: {
+                    name: true,
+                    email: true,
+                    image: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
+
+    return result;
 };
 
-export const TutorService = { createOrUpdateProfile,getMyStudents, updateAvailability, getAllTutors };
+export const TutorService = { createOrUpdateProfile, getMyStudents, updateAvailability, getAllTutors };
