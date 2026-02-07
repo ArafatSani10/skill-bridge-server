@@ -51,7 +51,12 @@ const getMyBookings = async (userId: string, role: string) => {
         });
     } else {
         return await prisma.booking.findMany({
-            where: { studentId: userId },
+            where: { 
+                studentId: userId,
+                status: {
+                    not: "CANCELLED" 
+                }
+            },
             include: { 
                 tutor: { include: { user: { select: { name: true, image: true } } } }, 
                 slot: true 

@@ -21,7 +21,10 @@ const getTutorStats = async (tutorUserId: string) => {
     }
 
     const totalSessions = await prisma.booking.count({
-        where: { tutorId: tutorProfile.id }
+        where: { 
+            tutorId: tutorProfile.id,
+            status: "CONFIRMED" 
+        }
     });
 
     return {
