@@ -1,3 +1,4 @@
+import { UserStatus } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 
 const getAllUsers = async () => {
@@ -7,16 +8,19 @@ const getAllUsers = async () => {
             name: true,
             email: true,
             role: true,
+            image: true,
             status: true,
             createdAt: true
         }
     });
 };
 
-const toggleUserStatus = async (userId: string, status: string) => {
+const toggleUserStatus = async (userId: string, status: UserStatus) => { 
     return await prisma.user.update({
         where: { id: userId },
-        data: { status }
+        data: {
+            status: status 
+        }
     });
 };
 
@@ -27,7 +31,8 @@ const getAllBookings = async () => {
             student: {
                 select: {
                     name: true,
-                    email: true
+                    email: true,
+                    image: true
                 }
             },
             tutor: {
