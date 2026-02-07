@@ -10,7 +10,15 @@ const getAllUsers = async () => {
             role: true,
             image: true,
             status: true,
-            createdAt: true
+            createdAt: true,
+            tutorProfile: {
+                include: {
+                    categories: true 
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
         }
     });
 };
