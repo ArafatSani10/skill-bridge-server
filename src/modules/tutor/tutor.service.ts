@@ -75,17 +75,29 @@ const getAllTutors = async (query: any) => {
         include: {
             user: { select: { name: true, image: true, email: true } },
             categories: true,
-            reviews: true,
+            bookings: true,
             slots: {
                 where: {
                     isBooked: false
+                }
+            },
+            reviews: {
+                include: {
+                    student: {
+                        select: {
+                            name: true,
+                            image: true
+                        }
+                    }
+                },
+                orderBy: {
+                    createdAt: 'desc'
                 }
             }
         },
         orderBy: sortBy ? { [sortBy]: sortOrder || 'desc' } : { averageRating: 'desc' }
     });
 };
-
 
 const getMyStudents = async (userId: string) => {
     const tutor = await prisma.tutorProfile.findUnique({
