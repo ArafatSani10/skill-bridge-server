@@ -25,6 +25,22 @@ const updateUserStatus = async (req: Request, res: Response) => {
     }
 };
 
+
+const updateUserRole = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { role } = req.body;
+        const result = await AdminService.updateUserRoleInDB(id, role);
+        res.status(200).json({
+            success: true,
+            message: `User role updated to ${role}`,
+            data: result
+        });
+    } catch (error: any) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
 const getAllBookings = async (req: Request, res: Response) => {
     try {
         const result = await AdminService.getAllBookings();
@@ -84,6 +100,7 @@ const addCategory = async (req: Request, res: Response) => {
 export const AdminController = {
     getAllUsers,
     updateUserStatus,
+    updateUserRole,
     getAllBookings,
     getCategories,
     addCategory,

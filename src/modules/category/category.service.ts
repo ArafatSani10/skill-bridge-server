@@ -6,7 +6,7 @@ const createCategory = async (subjectName: string) => {
     });
 
     if (isExist) {
-        throw new Error(`Subject '${subjectName}' already exists in the category list.`);
+        throw new Error(`Subject '${subjectName}' already exists.`);
     }
 
     return await prisma.category.create({
@@ -29,10 +29,10 @@ const getAllCategories = async () => {
     });
 };
 
-const updateCategoryInDB = async (id: string, updatedName: string) => {
+const updateCategoryInDB = async (id: string, name: string) => {
     return await prisma.category.update({
         where: { id },
-        data: { name: updatedName }
+        data: { name: name }
     });
 };
 
@@ -41,7 +41,6 @@ const deleteCategoryFromDB = async (id: string) => {
         where: { id }
     });
 };
-
 
 export const CategoryService = {
     createCategory,

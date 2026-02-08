@@ -60,6 +60,13 @@ const getAllBookings = async () => {
     });
 };
 
+const updateUserRoleInDB = async (userId: string, role: UserRole) => {
+    return await prisma.user.update({
+        where: { id: userId },
+        data: { role: role }
+    });
+};
+
 
 const createCategoryInDB = async (name: string) => {
     return await prisma.category.create({
@@ -83,6 +90,7 @@ const getAllCategoriesFromDB = async () => {
 export const AdminService = {
     getAllUsers,
     toggleUserStatus,
+    updateUserRoleInDB,
     getAllBookings,
     createCategoryInDB,
     getAllCategoriesFromDB,
