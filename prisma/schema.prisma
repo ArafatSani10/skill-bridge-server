@@ -78,26 +78,29 @@ model AvailabilitySlot {
   startTime DateTime
   endTime   DateTime
   isBooked  Boolean      @default(false)
-  booking   Booking?
+
+  bookings Booking[] @relation("SlotToBooking")
 
   @@index([tutorId])
 }
 
 model Booking {
-  id        String           @id @default(uuid())
+  id        String       @id @default(uuid())
   studentId String
-  student   User             @relation("StudentToBooking", fields: [studentId], references: [id])
+  student   User         @relation("StudentToBooking", fields: [studentId], references: [id])
   tutorId   String
-  tutor     TutorProfile     @relation("TutorToBooking", fields: [tutorId], references: [id])
-  slotId    String           @unique
-  slot      AvailabilitySlot @relation(fields: [slotId], references: [id])
-  status    BookingStatus    @default(PENDING)
+  tutor     TutorProfile @relation("TutorToBooking", fields: [tutorId], references: [id])
+
+  slotId String
+  slot   AvailabilitySlot @relation("SlotToBooking", fields: [slotId], references: [id])
+
+  status    BookingStatus @default(PENDING)
   review    Review?
-  createdAt DateTime         @default(now())
+  createdAt DateTime      @default(now())
 
   @@index([studentId])
   @@index([tutorId])
-  
+  @@index([slotId])
 }
 
 model Review {

@@ -1,20 +1,24 @@
 import { prisma } from "../../lib/prisma";
 
 const createBooking = async (studentId: string, tutorId: string, slotId: string) => {
-    const slot = await prisma.availabilitySlot.findUnique({
-        where: { id: slotId }
-    });
-
-    if (!slot) throw new Error("This slot does not exist!");
-    if (slot.isBooked) throw new Error("This slot is already taken!");
-
-    const existingBooking = await prisma.booking.findFirst({
-        where: { studentId, slotId }
-    });
-
-    if (existingBooking) throw new Error("You have already booked this specific slot!");
-
     return await prisma.$transaction(async (tx) => {
+        const slot = await tx.availabilitySlot.findUnique({
+            where: { id: slotId }
+        });
+
+        if (!slot) throw new Error("This slot does not exist!");
+        if (slot.isBooked) throw new Error("This slot is already taken!");
+
+        const existingBooking = await tx.booking.findFirst({
+            where: {
+                studentId,
+                slotId,
+                status: { not: "CANCELLED" }
+            }
+        });
+
+        if (existingBooking) throw new Error("You already have an active booking for this slot!");
+
         const booking = await tx.booking.create({
             data: {
                 studentId,
@@ -43,23 +47,23 @@ const getMyBookings = async (userId: string, role: string) => {
 
         return await prisma.booking.findMany({
             where: { tutorId: tutorProfile.id },
-            include: { 
-                student: { select: { name: true, image: true, email: true } }, 
-                slot: true 
+            include: {
+                student: { select: { name: true, image: true, email: true } },
+                slot: true
             },
             orderBy: { createdAt: 'desc' }
         });
     } else {
         return await prisma.booking.findMany({
-            where: { 
+            where: {
                 studentId: userId,
                 status: {
-                    not: "CANCELLED" 
+                    not: "CANCELLED"
                 }
             },
-            include: { 
-                tutor: { include: { user: { select: { name: true, image: true } } } }, 
-                slot: true 
+            include: {
+                tutor: { include: { user: { select: { name: true, image: true } } } },
+                slot: true
             },
             orderBy: { createdAt: 'desc' }
         });
@@ -106,9 +110,9 @@ const updateBookingStatus = async (bookingId: string, userId: string, status: an
     });
 };
 
-export const BookingService = { 
-    createBooking, 
-    getMyBookings, 
-    updateBookingStatus, 
-    getBookingById 
+export const BookingService = {
+    createBooking,
+    getMyBookings,
+    updateBookingStatus,
+    getBookingById
 };

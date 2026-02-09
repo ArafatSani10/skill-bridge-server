@@ -27,19 +27,50 @@ const createOrUpdateProfile = async (userId: string, data: any) => {
     });
 };
 
-const updateAvailability = async (userId: string, slots: { startTime: Date, endTime: Date }[]) => {
+const updateAvailability = async (userId: string, slots: { startTime: string, endTime: string, day: string }[]) => {
     const tutor = await prisma.tutorProfile.findUnique({
         where: { userId }
     });
 
     if (!tutor) throw new Error("Tutor profile not found!");
 
-    return await prisma.availabilitySlot.createMany({
-        data: slots.map(slot => ({
-            tutorId: tutor.id,
-            startTime: new Date(slot.startTime),
-            endTime: new Date(slot.endTime),
-        }))
+    return await prisma.$transaction(async (tx) => {
+        await tx.availabilitySlot.deleteMany({
+            where: {
+                tutorId: tutor.id,
+                isBooked: false
+            }
+        });
+
+        const allGeneratedSlots: any[] = [];
+
+        slots.forEach(slot => {
+            let currentStart = new Date(slot.startTime);
+            const finalEnd = new Date(slot.endTime);
+
+            while (currentStart < finalEnd) {
+                const nextHour = new Date(currentStart);
+                nextHour.setHours(nextHour.getHours() + 1);
+
+                if (nextHour <= finalEnd) {
+                    allGeneratedSlots.push({
+                        tutorId: tutor.id,
+                        startTime: new Date(currentStart),
+                        endTime: new Date(nextHour),
+                    });
+                }
+
+                currentStart = new Date(nextHour);
+            }
+        });
+
+        if (allGeneratedSlots.length > 0) {
+            return await tx.availabilitySlot.createMany({
+                data: allGeneratedSlots
+            });
+        }
+
+        return { count: 0 };
     });
 };
 

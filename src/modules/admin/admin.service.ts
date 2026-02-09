@@ -13,7 +13,7 @@ const getAllUsers = async () => {
             createdAt: true,
             tutorProfile: {
                 include: {
-                    categories: true 
+                    categories: true
                 }
             }
         },
@@ -23,12 +23,31 @@ const getAllUsers = async () => {
     });
 };
 
-const toggleUserStatus = async (userId: string, status: UserStatus) => { 
-    return await prisma.user.update({
-        where: { id: userId },
-        data: {
-            status: status 
+// const toggleUserStatus = async (userId: string, status: UserStatus) => { 
+//     return await prisma.user.update({
+//         where: { id: userId },
+//         data: {
+//             status: status 
+//         }
+//     });
+// };
+
+const toggleUserStatus = async (userId: string, status: UserStatus) => {
+    return await prisma.$transaction(async (tx) => {
+        const updatedUser = await tx.user.update({
+            where: { id: userId },
+            data: {
+                status: status
+            }
+        });
+
+        if (status === "BLOCKED" || status === "SUSPENDED") {
+            await tx.session.deleteMany({
+                where: { userId: userId }
+            });
         }
+
+        return updatedUser;
     });
 };
 
