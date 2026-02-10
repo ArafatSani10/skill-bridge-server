@@ -10,7 +10,11 @@ import { AdminRoutes } from "./modules/admin/admin.routes";
 import { StatsRoutes } from "./modules/stats/stats.routes";
 const app: Application = express();
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: [
+        "https://skill-bridge-client-eight.vercel.app", 
+        "https://skill-bridge-client-j8vt4fryn-arafats-projects-82b84c9a.vercel.app" ,
+        "http://localhost:3000"
+    ],
     credentials: true
 }));
 app.use(express.json());

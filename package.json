@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsup src/index.ts --format esm --platform node --target node20 --outDir api --external pg-native",
     "seed:admin": "npx tsx watch src/scripts/seedAdmin.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "@types/node": "^25.0.10",
     "@types/pg": "^8.16.0",
     "prisma": "^7.3.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },

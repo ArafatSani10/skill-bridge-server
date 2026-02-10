@@ -1,32 +1,3 @@
-// import { betterAuth } from "better-auth";
-// import { prismaAdapter } from "better-auth/adapters/prisma";
-// import { prisma } from "./prisma";
-
-
-
-// export const auth = betterAuth({
-//     database: prismaAdapter(prisma, {
-//         provider: "postgresql",
-//     }),
-//     trustedOrigins: ["http://localhost:3000"],
-//     emailAndPassword: {
-//         enabled: true,
-//     },
-//     user: {
-//         additionalFields: {
-//             role: {
-//                 type: "string",
-//                 required: false,
-//                 defaultValue: "STUDENT",
-//             },
-//         },
-//     },
-// });
-
-
-
-
-
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
@@ -35,10 +6,23 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
-    trustedOrigins: ["http://localhost:3000"],
+
+    // কুকি সেটিংস যা ক্রস-ডোমেইনের জন্য মাস্ট
+    cookie: {
+        sameSite: "none", 
+        secure: true,     
+    },
+
+    trustedOrigins: [
+        "https://skill-bridge-client-eight.vercel.app",
+        "https://skill-bridge-client-j8vt4fryn-arafats-projects-82b84c9a.vercel.app",
+        "http://localhost:3000"
+    ],
+
     emailAndPassword: {
         enabled: true,
     },
+
     user: {
         additionalFields: {
             role: {
@@ -53,6 +37,9 @@ export const auth = betterAuth({
             },
         },
     },
+
+    // যদি sendUserInfo টাইপ এরর দেয়, তবে এটি বাদ দিয়ে 
+    // সরাসরি databaseHooks ব্যবহার করাই বুদ্ধিমানের কাজ
     databaseHooks: {
         session: {
             create: {
