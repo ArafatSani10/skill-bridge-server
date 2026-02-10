@@ -7,17 +7,31 @@ export const auth = betterAuth({
         provider: "postgresql",
     }),
 
-    // কুকি সেটিংস যা ক্রস-ডোমেইনের জন্য মাস্ট
-    cookie: {
-        sameSite: "none", 
-        secure: true,     
-    },
+    baseURL: process.env.BETTER_AUTH_URL,
 
+    // ১. এখানে প্রডাকশন লিঙ্কটি সবার আগে রাখুন
     trustedOrigins: [
         "https://skill-bridge-client-eight.vercel.app",
-        "https://skill-bridge-client-j8vt4fryn-arafats-projects-82b84c9a.vercel.app",
         "http://localhost:3000"
     ],
+
+    // ২. কুকি সেকশনে ক্রস-সাইট সাপোর্ট নিশ্চিত করা
+    advanced: {
+        useSecureCookies: true, // প্রডাকশনে এটি বাধ্যতামূলক
+    },
+
+    cookie: {
+        sameSite: "none", // ক্রস-সাইট কুকির জন্য
+        secure: true,     // HTTPS এর জন্য
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7, // ১ সপ্তাহ
+    },
+
+    // ৩. সেশন সেটিংস (এটি আপনার সেশন ম্যানেজমেন্টকে আরও শক্ত করবে)
+    session: {
+        expiresIn: 60 * 60 * 24 * 7, // সেশন ৭ দিন স্থায়ী হবে
+        updateAge: 60 * 60 * 24,    // প্রতিদিন সেশন আপডেট হবে
+    },
 
     emailAndPassword: {
         enabled: true,
@@ -25,21 +39,11 @@ export const auth = betterAuth({
 
     user: {
         additionalFields: {
-            role: {
-                type: "string",
-                required: false,
-                defaultValue: "STUDENT",
-            },
-            status: {
-                type: "string",
-                required: false,
-                defaultValue: "ACTIVE",
-            },
+            role: { type: "string", required: false, defaultValue: "STUDENT" },
+            status: { type: "string", required: false, defaultValue: "ACTIVE" },
         },
     },
 
-    // যদি sendUserInfo টাইপ এরর দেয়, তবে এটি বাদ দিয়ে 
-    // সরাসরি databaseHooks ব্যবহার করাই বুদ্ধিমানের কাজ
     databaseHooks: {
         session: {
             create: {
@@ -47,7 +51,6 @@ export const auth = betterAuth({
                     const user = await prisma.user.findUnique({
                         where: { id: session.userId }
                     });
-
                     if (user && user.status === "BLOCKED") {
                         throw new Error("BANNED_USER");
                     }

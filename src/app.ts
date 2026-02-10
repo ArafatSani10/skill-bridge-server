@@ -10,12 +10,8 @@ import { AdminRoutes } from "./modules/admin/admin.routes";
 import { StatsRoutes } from "./modules/stats/stats.routes";
 const app: Application = express();
 app.use(cors({
-    origin: [
-        "https://skill-bridge-client-eight.vercel.app", 
-        "https://skill-bridge-client-j8vt4fryn-arafats-projects-82b84c9a.vercel.app" ,
-        "http://localhost:3000"
-    ],
-    credentials: true
+    origin: "https://skill-bridge-client-eight.vercel.app", // একদম হুবহু আপনার ফ্রন্টএন্ড লিঙ্ক
+    credentials: true, // এটা ছাড়া কুকি কোনোদিনও আসবে না
 }));
 app.use(express.json());
 app.all("/api/auth/*", (req, res) => {
